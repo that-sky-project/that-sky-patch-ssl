@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "game_edition": 3,
   "mod_name": "SSL Patch",
-  "description": "Skips SSL certificate-chain verification in Sky: CotL by hooking ssl_verify_cert_chain. Configurable via sslpatch.json.",
+  "description": "Bypasses SSL/TLS certificate verification in Sky: CotL (patch_ssl) and/or redirects account traffic to a custom server (custom_server). Configurable via sslpatch.json.",
   "main": "ssl-patch.dll",
   "dependencies": {},
   "keywords": ["ssl", "certificate", "patch", "network"],
   "author": "Thexiaoyu",
-  "license": "GUN Public 3",
+  "license": "AGPL3",
   "website": ""
 }
