@@ -25,9 +25,10 @@ static const HTAsmSig kHttpClientRequest = {
 
 // WebSocket::Connect(this /*rcx*/, Net::Uri* uri /*rdx*/, const char* subprotocol /*r8*/,
 //                    HttpClientRequestArgs* args /*r9*/) -> char.
+// The running-state member offset changed from 0x5118 to 0x20C18; wildcard it.
 static const HTAsmSig kWebSocketConnect = {
   "55 41 57 41 56 41 54 56 57 53 48 81 EC 30 01 00 00 48 8D AC 24 80 00 00 00 "
-  "4C 89 CF 4D 89 C6 48 89 CE 80 B9 18 51 00 00 01",
+  "4C 89 CF 4D 89 C6 48 89 CE 80 B9 ?? ?? ?? ?? 01",
   HTSigScanType_Direct,
   0,
 };

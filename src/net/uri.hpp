@@ -1,6 +1,7 @@
 #pragma once
 #include "config/config.hpp"
 #include "util/log.hpp"
+#include <cstddef>
 #include <cstring>
 #include <string>
 
@@ -8,12 +9,15 @@ namespace xyl::net {
 
 // Net::Uri 
 struct NetUri {
-  char protocol[8];   // +0
-  char domain[128];   // +8
-  char port[6];       // +136  (string; empty = default port)
-  char path[256];     // +142
+  char protocol[10];  // +0
+  char domain[128];   // +10
+  char port[6];       // +138  (string; empty = default port)
+  char path[256];     // +144
 };
-static_assert(sizeof(NetUri) == 398, "Net::Uri must be 398 bytes");
+static_assert(sizeof(NetUri) == 400, "Net::Uri must be 400 bytes");
+static_assert(offsetof(NetUri, domain) == 10, "Net::Uri domain offset must be 10");
+static_assert(offsetof(NetUri, port) == 138, "Net::Uri port offset must be 138");
+static_assert(offsetof(NetUri, path) == 144, "Net::Uri path offset must be 144");
 
 inline void setField(char *dst, size_t n, const std::string &s) {
   strncpy(dst, s.c_str(), n - 1);
@@ -26,7 +30,7 @@ inline void setField(char *dst, size_t n, const std::string &s) {
 // `map.to` may be "host" or "host:port"; the port goes into its own field.
 inline void applyRedirect(NetUri *uri, const config::DomainMap &map) {
   if (!uri) return;
-  if (config::get().customServer.forceHttp) strcpy(uri->protocol, "http"); // fits protocol[8]
+  if (config::get().customServer.forceHttp) strcpy(uri->protocol, "http"); // fits protocol[10]
   if (map.from.empty() || map.from != uri->domain) return;
 
   size_t colon = map.to.rfind(':');
