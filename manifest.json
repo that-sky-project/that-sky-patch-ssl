@@ -1,6 +1,6 @@
 {
   "package_name": "sslpatch",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "game_edition": 3,
   "mod_name": "SSL Patch",
   "description": "Bypasses SSL/TLS certificate verification in Sky: CotL (patch_ssl) and/or redirects account traffic to a custom server (custom_server). Configurable via sslpatch.json.",
