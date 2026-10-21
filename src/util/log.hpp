@@ -11,7 +11,7 @@ inline void logv(const char *fmt, va_list ap) {
   OutputDebugStringA("[XYLoader] ");
   OutputDebugStringA(buf);
   OutputDebugStringA("\n");
-  HTTellText("§b[XY]§r %s", buf); 
+  HTTellText("§b[XYSSL]§r %s", buf); 
 }
 
 inline void log(const char *fmt, ...) {
