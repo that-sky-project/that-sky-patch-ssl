@@ -50,4 +50,59 @@ inline void logUri(const char *channel, const NetUri *uri) {
         uri->port[0] ? ":" : "", uri->port, uri->path);
 }
 
+// URL-string redirect for the account WebSocket Connect overload.
+// `url` looks like "https://host[:port]/account/ws". When the host exactly
+// matches `map.from` it is rewritten to `map.to` ("host" or "host:port").
+// force_http downgrades the scheme to http. The path is preserved.
+// Writes into dst (always NUL-terminated when n > 0) and returns true when
+// the URL was changed. `url` and `dst` may alias.
+inline bool applyRedirectUrl(const char *url, char *dst, size_t n,
+                             const config::DomainMap &map) {
+  if (!url || !dst || n == 0) return false;
+  const bool forceHttp = config::get().customServer.forceHttp;
+
+  const char *schemeEnd = strstr(url, "://");
+  if (!schemeEnd) {
+    snprintf(dst, n, "%s", url);
+    return false;
+  }
+  std::string scheme(url, schemeEnd);
+  const char *hostBegin = schemeEnd + 3;
+
+  // Path starts at the first '/' after "://" (never inside the scheme).
+  const char *path = strchr(hostBegin, '/');
+  std::string hostPort = path ? std::string(hostBegin, path) : std::string(hostBegin);
+  if (!path) path = "";
+
+  size_t colon = hostPort.rfind(':');
+  std::string host = (colon != std::string::npos) ? hostPort.substr(0, colon)
+                                                  : hostPort;
+  std::string port = (colon != std::string::npos) ? hostPort.substr(colon + 1)
+                                                  : std::string();
+
+  bool changed = false;
+  if (forceHttp && scheme != "http") {
+    scheme = "http";
+    changed = true;
+  }
+
+  if (!map.from.empty() && map.from == host) {
+    size_t toColon = map.to.rfind(':');
+    if (toColon != std::string::npos) {
+      host = map.to.substr(0, toColon);
+      port = map.to.substr(toColon + 1);
+    } else {
+      host = map.to;
+      port.clear(); // no port => use the default (80/443)
+    }
+    changed = true;
+    XYLOG("net: domain %s -> %s%s%s", map.from.c_str(), host.c_str(),
+          port.empty() ? "" : ":", port.c_str());
+  }
+
+  snprintf(dst, n, "%s://%s%s%s%s", scheme.c_str(), host.c_str(),
+           port.empty() ? "" : ":", port.c_str(), path);
+  return changed;
+}
+
 } // namespace xyl::net

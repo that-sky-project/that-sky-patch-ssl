@@ -23,12 +23,15 @@ static const HTAsmSig kHttpClientRequest = {
   0x07,
 };
 
-// WebSocket::Connect(this /*rcx*/, Net::Uri* uri /*rdx*/, const char* subprotocol /*r8*/,
-//                    HttpClientRequestArgs* args /*r9*/) -> char.
-// The running-state member offset changed from 0x5118 to 0x20C18; wildcard it.
+// AccountServerWebSocket string Connect (only caller: account WS @ /account/ws).
+// char Connect(this /*rcx*/, const char* url /*rdx*/, const char* host /*r8*/,
+//              HttpClientRequestArgs* args /*r9*/) -> char.
+// Parses the URL into a stack NetUri then forwards to the shared
+// WebSocket::Connect. The shared Connect (sub_14010A620) is also used by the
+// MQTT channel (path forced to "mqtt"), so hooking it would catch MQTT too.
 static const HTAsmSig kWebSocketConnect = {
-  "55 41 57 41 56 41 54 56 57 53 48 81 EC 30 01 00 00 48 8D AC 24 80 00 00 00 "
-  "4C 89 CF 4D 89 C6 48 89 CE 80 B9 ?? ?? ?? ?? 01",
+  "55 41 57 41 56 56 57 53 48 81 EC B8 01 00 00 48 8D AC 24 80 00 00 00 "
+  "4C 89 CE 4C 89 C7 48 89 D3 49 89 CE C5 F8 57 C0",
   HTSigScanType_Direct,
   0,
 };
